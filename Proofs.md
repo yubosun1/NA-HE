@@ -2,7 +2,7 @@
 
 
 
-${\rm{Z}}_p^{{\rm{|}}{{P}_{p,q}}{\rm{|}}}{\rm{ = Z}}_q^{{\rm{|}}{{P}_{p,q}}{\rm{|}}}$  and $ t_p^{|{{P}_{p,q}}{\rm{| + }}1}{\rm{ = }}t_q^{|{{ P}_{p,q}}{\rm{| + }}1} $
+${\rm{Z}}_p^{{\rm{|}}{{P}_{p,q}}{\rm{|}}}{\rm{ = Z}}_q^{{\rm{|}}{{P}_{p,q}}{\rm{|}}}$  and $t_p^{|{{P}_{p,q}}{\rm{| + }}1}{\rm{ = }}t_q^{|{{ P}_{p,q}}{\rm{| + }}1}$
 
 
 
@@ -14,7 +14,7 @@ Thus, Theorem 1 holds.
 
 
 
-### ## Preposition 1
+## Preposition 1
 
 
 
