@@ -37,7 +37,7 @@ void point2Mappedpoint(Point p, MappedPoint *mPoint) {
 }
 vector<Point> readData(char *file)
 {
-	//FILE *fp = fopen(@"F:\jly\data\spatial\newyork","r");
+	//FILE *fp = fopen(@"filepath","r");
 	vector<Point> vec;
 	std::ifstream fin(file, std::ios::in);
 	char line[1024] = { 0 };
