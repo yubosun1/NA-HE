@@ -1,5 +1,5 @@
 #pragma once
-#include "qhc.h"
+#include "Neighbor-aware.h"
 #include <stdlib.h>
 #include <vector>
 #include <math.h>
@@ -227,7 +227,7 @@ bitmask_t en_neibourAware(bitmask_t &prevCode, int &iterStartPos, halfmask_t Gri
  * - Caches intermediate states to minimize redundant computations
  */
 void de_neibourAware(halfmask_t &prevLon, halfmask_t &prevLat, int &iterStartPos, 
-	halfmask_t &currentLon, halfmask_t &currentLat, bitmask_t currentCode, bitmask_t nextCode, int k)
+	halfmask_t &currentLon, halfmask_t &currentLat, bitmask_t currentCode, bitmask_t nextCode, int k){
 	
 	char nType = 0;         // Current Hilbert curve state (orientation/rotation)
 	char posKey = 0;        // Decoded position key (contains x,y bit pair)
