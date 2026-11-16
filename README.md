@@ -18,7 +18,6 @@ Each encoder or decoder owns a `(k+1)`-byte state array (`33` bytes when `k=32`)
 - `src/Neighbor-aware.h`: stream-local encoder/decoder interfaces
 - `src/Neighbor-aware.cpp`: NA-HE/NA-HD implementation
 - `src/test.cpp`: reference-based correctness and boundary tests
-- `Proofs.tex`: source of the formal proofs
 - `Proofs.pdf`: compiled formal proofs
 
 ## Build and test
