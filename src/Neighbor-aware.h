@@ -1,12 +1,69 @@
-#pragma once
-#include "common.h" 
-#include <stdint.h>
-#define MAX(x,y) (x>y?x:y)
+#ifndef NAHE_NEIGHBOR_AWARE_H
+#define NAHE_NEIGHBOR_AWARE_H
 
-bitmask_t en_neibourAware(bitmask_t &prevCode, int &iterStartPos, halfmask_t GridX, halfmask_t GridY, halfmask_t nextX, halfmask_t nextY, int k);
-void de_neibourAware(halfmask_t &prevLon, halfmask_t &prevLat, int &iterStartPos, halfmask_t &currentLon, halfmask_t &currentLat, bitmask_t currentCode, bitmask_t nextCode, int k);
+#include <cstddef>
+#include <cstdint>
+#include <vector>
 
-extern int en_update_number;
-extern int en_coding_number;
-extern int de_update_number;
-extern int de_coding_number;
+namespace nahe {
+
+using Coordinate = std::uint32_t;
+using Code = std::uint64_t;
+
+struct GridPoint {
+    Coordinate x;
+    Coordinate y;
+};
+
+// One encoder object owns the state of one coordinate sequence.
+class Encoder {
+public:
+    explicit Encoder(int levels);
+
+    // Encode the current point with one-step lookahead. For the last point,
+    // pass its coordinates again as next_x and next_y.
+    Code encode(Coordinate x, Coordinate y, Coordinate next_x, Coordinate next_y);
+
+    void reset();
+    int levels() const { return levels_; }
+    std::size_t state_bytes() const { return memory_.size(); }
+    std::uint64_t coded_levels() const { return coded_levels_; }
+    std::uint64_t updated_levels() const { return updated_levels_; }
+
+private:
+    int levels_;
+    int iter_start_pos_;
+    Code previous_code_;
+    std::vector<std::uint8_t> memory_;
+    std::uint64_t coded_levels_;
+    std::uint64_t updated_levels_;
+};
+
+// One decoder object owns the state of one sorted Hilbert-code sequence.
+class Decoder {
+public:
+    explicit Decoder(int levels);
+
+    // Decode the current code with one-step lookahead. For the last code,
+    // pass current_code again as next_code.
+    GridPoint decode(Code current_code, Code next_code);
+
+    void reset();
+    int levels() const { return levels_; }
+    std::size_t state_bytes() const { return memory_.size(); }
+    std::uint64_t decoded_levels() const { return decoded_levels_; }
+    std::uint64_t updated_levels() const { return updated_levels_; }
+
+private:
+    int levels_;
+    int iter_start_pos_;
+    Coordinate previous_x_;
+    Coordinate previous_y_;
+    std::vector<std::uint8_t> memory_;
+    std::uint64_t decoded_levels_;
+    std::uint64_t updated_levels_;
+};
+
+}  // namespace nahe
+
+#endif  // NAHE_NEIGHBOR_AWARE_H

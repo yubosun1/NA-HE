@@ -1,20 +1,49 @@
-# NA-HE & NA-HD CODE
+# NA-HE & NA-HD
 
-### Efficient Constant-Time Complexity Hilbert Curve Encoding and Decoding Algorithms
+Core reference implementation of **Neighbor-Aware Hilbert Encoding (NA-HE)** and **Decoding (NA-HD)**. The algorithms reuse coordinate/code prefixes across consecutive inputs and use the three-point Dynamic Updating Mechanism (DUM) to keep cached Hilbert states valid.
 
-We propose novel **Neighbor-aware Hilbert Encoding (NA-HE)** and **Neighbor-aware Hilbert Decoding (NA-HD)** algorithms to address the efficiency bottleneck of traditional Hilbert curve operations. Unlike existing methods that process points individually, our approach systematically exploits inter-point relationships (spatial locality) common in web-scale datasets.
+This repository intentionally contains only the core codecs, their correctness tests, and formal proofs. Range-query benchmarks and application-specific pipelines are outside its scope.
 
-By establishing **2-point and 3-point models**, utilizing a **state array**, and employing a **Dynamic Updating Mechanism (DUM)**, NA-HE and NA-HD minimize redundant iterations. Theoretical analysis and experiments show that our algorithms reduce the average per-point time complexity from **O(k)** to **O(1)** (where *k* is the Hilbert order). Experimental results demonstrate a speedup of up to **35.28x** over state-of-the-art algorithms on trajectory and window datasets.
+## Requirements
 
-### Environment
+- C++11 or newer
+- GCC, Clang, or MSVC
+- Grid levels `k` in `[1, 32]`
+- 32-bit coordinates and 64-bit Hilbert codes
 
-- **System:** Windows 11 / macOS (tested on macOS 15.2+)
-- **Language:** C++ (Standard C++11 or higher)
-- **Compiler:** GCC / Clang / MSVC
+Each encoder or decoder owns a `(k+1)`-byte state array (`33` bytes when `k=32`). Use a separate object for every independent sequence; no state is shared globally.
 
-### Files Introduction
+## Files
 
-- **Neighbor-aware.h**: Header file declaring the NA-HE and NA-HD functions
-- **Neighbor-aware.cpp**: Implementation of NA-HE and NA-HD algorithms with detailed comments
-- **common.h**: Common type definitions (halfmask_t, bitmask_t)
-- **test_imageContour**: Test program for image contour extraction and compression using NA-HD algorithm 
+- `src/Neighbor-aware.h`: stream-local encoder/decoder interfaces
+- `src/Neighbor-aware.cpp`: NA-HE/NA-HD implementation
+- `src/test.cpp`: reference-based correctness and boundary tests
+- `Proofs.tex`: source of the formal proofs
+- `Proofs.pdf`: compiled formal proofs
+
+## Build and test
+
+```sh
+mkdir -p build
+c++ -std=c++11 -O3 -DNDEBUG -Wall -Wextra -Wpedantic \
+  src/Neighbor-aware.cpp src/test.cpp -o build/test
+./build/test
+```
+
+The tests cover exhaustive small grids, S-order windows, sorted-code decoding, duplicate and single-point inputs, random sequences, `k=32` boundaries, interleaved independent streams, reset/replay, and the exact AEL/ADL formulas.
+
+## Usage
+
+```cpp
+#include "src/Neighbor-aware.h"
+
+nahe::Encoder encoder(32);
+nahe::Code code = encoder.encode(x, y, next_x, next_y);
+
+nahe::Decoder decoder(32);
+nahe::GridPoint point = decoder.decode(code, next_code);
+```
+
+Pass the current point/code again as the lookahead input for the final item in a sequence. NA-HD expects codes in sorted order. Call `reset()` before reusing an object for a new sequence.
+
+The `coded_levels()`, `decoded_levels()`, and `updated_levels()` accessors expose operation counts for evaluating AEL, ADL, and DUM updates. `state_bytes()` reports the `(k+1)`-byte state-array size; it does not include bookkeeping fields in the C++ object.
